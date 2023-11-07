@@ -15,6 +15,9 @@ private:
     void Advance();
     char Peek();
 
+    Token CreateToken(Token::Type type, std::string literal);
+
+    void SkipWhitespace();
     Token ReadIdentifier();
     Token ReadNumber();
 
@@ -22,6 +25,9 @@ private:
     uint _position;
     uint _read_position;
     char _char;
+
+    uint _line;
+    uint _column;
 };
 
 inline std::unordered_map<std::string, Token::Type> keywords = {

@@ -20,6 +20,29 @@ Program Parser::Parse() {
     return program;
 }
 
+Parser::Precedence Parser::GetPrecedence(Token::Type type) {
+    switch (type) {
+    case Token::Type::LPAREN:
+        return Precedence::CALL;
+    case Token::Type::SLASH:
+    case Token::Type::ASTERISK:
+        return Precedence::PRODUCT;
+    case Token::Type::PLUS:
+    case Token::Type::MINUS:
+        return Precedence::SUM;
+    case Token::Type::LESS:
+    case Token::Type::GREATER:
+        return Precedence::LESS_GREATER;
+    case Token::Type::EQUAL:
+    case Token::Type::NOT_EQUAL:
+    case Token::Type::LESS_EQUAL:
+    case Token::Type::GREATER_EQUAL:
+        return Precedence::EQUAL;
+    default:
+        return Precedence::LOWEST;
+    }
+}
+
 void Parser::Advance() {
     _current_token = std::move(_peek_token);
     _peek_token = _lexer.NextToken();
@@ -113,10 +136,10 @@ Expression* Parser::ParseExpression(Precedence precedence) {
         left = ParseBooleanLiteral(true);
         break;
     case Token::Type::BANG:
-        left = ParsePrefixExpression(PrefixExpression::Operation::Not);
+        left = ParsePrefixExpression(PrefixExpression::Operation::NOT);
         break;
     case Token::Type::MINUS:
-        left = ParsePrefixExpression(PrefixExpression::Operation::Negate);
+        left = ParsePrefixExpression(PrefixExpression::Operation::NEGATE);
         break;
     case Token::Type::LPAREN:
         left = ParseGroupedExpression();
@@ -128,7 +151,7 @@ Expression* Parser::ParseExpression(Precedence precedence) {
         left = ParseFunctionLiteral();
         break;
     default:
-        std::cerr << "No prefix parse function for " << _current_token << std::endl;
+        Error("Unexpected token \"" + _current_token.literal + "\"");
         return nullptr;
     }
 
@@ -186,25 +209,29 @@ Expression* Parser::ParseGroupedExpression() {
 Expression* Parser::ParseInfixExpression(Expression* left) {
     switch (_current_token.type) {
     case Token::Type::PLUS:
-        return ParseBasicInfixExpression(left, InfixExpression::Operation::Add);
+        return ParseBasicInfixExpression(left, InfixExpression::Operation::ADD);
     case Token::Type::MINUS:
-        return ParseBasicInfixExpression(left, InfixExpression::Operation::Subtract);
+        return ParseBasicInfixExpression(left, InfixExpression::Operation::SUBTRACT);
     case Token::Type::SLASH:
-        return ParseBasicInfixExpression(left, InfixExpression::Operation::Divide);
+        return ParseBasicInfixExpression(left, InfixExpression::Operation::DIVIDE);
     case Token::Type::ASTERISK:
-        return ParseBasicInfixExpression(left, InfixExpression::Operation::Multiply);
+        return ParseBasicInfixExpression(left, InfixExpression::Operation::MULTIPLY);
     case Token::Type::EQUAL:
-        return ParseBasicInfixExpression(left, InfixExpression::Operation::Equal);
+        return ParseBasicInfixExpression(left, InfixExpression::Operation::EQUAL);
     case Token::Type::NOT_EQUAL:
-        return ParseBasicInfixExpression(left, InfixExpression::Operation::NotEqual);
-    case Token::Type::LESS_THAN:
-        return ParseBasicInfixExpression(left, InfixExpression::Operation::LessThan);
-    case Token::Type::GREATER_THAN:
-        return ParseBasicInfixExpression(left, InfixExpression::Operation::GreaterThan);
+        return ParseBasicInfixExpression(left, InfixExpression::Operation::NOT_EQUAL);
+    case Token::Type::LESS:
+        return ParseBasicInfixExpression(left, InfixExpression::Operation::LESS);
+    case Token::Type::LESS_EQUAL:
+        return ParseBasicInfixExpression(left, InfixExpression::Operation::LESS_EQUAL);
+    case Token::Type::GREATER_EQUAL:
+        return ParseBasicInfixExpression(left, InfixExpression::Operation::GREATER_EQUAL);
+    case Token::Type::GREATER:
+        return ParseBasicInfixExpression(left, InfixExpression::Operation::GREATER);
     case Token::Type::LPAREN:
         return ParseCallExpression(left);
     default:
-        std::cerr << "No infix parse function for " << _current_token << std::endl;
+        Error("Unexpected token \"" + _current_token.literal + "\"");
         return nullptr;
     }
 }
@@ -351,37 +378,18 @@ CallExpression* Parser::ParseCallExpression(Expression* left) {
     return new CallExpression(left, arguments);
 }
 
-void Parser::Error(const std::string& message) { _errors.emplace_back(message); }
+void Parser::Error(const std::string& message) {
+    _errors.emplace_back(message, _current_token.line, _current_token.column);
+}
 
 bool Parser::PeekOrError(Token::Type type) {
     if (_peek_token.type != type) {
         std::stringstream str;
-        str << "Expected " << type << ", but found " << _peek_token;
+        str << "Expected token \"" << type << "\", but found \"" << _peek_token << "\"";
         Error(str.str());
 
         return false;
     }
 
     return true;
-}
-
-Parser::Precedence Parser::GetPrecedence(Token::Type type) {
-    switch (type) {
-    case Token::Type::LPAREN:
-        return Precedence::CALL;
-    case Token::Type::SLASH:
-    case Token::Type::ASTERISK:
-        return Precedence::PRODUCT;
-    case Token::Type::PLUS:
-    case Token::Type::MINUS:
-        return Precedence::SUM;
-    case Token::Type::LESS_THAN:
-    case Token::Type::GREATER_THAN:
-        return Precedence::LESS_GREATER;
-    case Token::Type::EQUAL:
-    case Token::Type::NOT_EQUAL:
-        return Precedence::EQUAL;
-    default:
-        return Precedence::LOWEST;
-    }
 }

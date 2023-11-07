@@ -1,7 +1,7 @@
 #include "token.h"
 
-
-Token::Token(Type type, std::string literal) : type(type), literal(literal) {}
+Token::Token(Type type, std::string literal, uint line, uint column)
+    : type(type), literal(literal), line(line), column(column) {}
 
 std::ostream& operator<<(std::ostream& stream, const Token& token) {
     return stream << token.literal;
@@ -23,73 +23,79 @@ std::ostream& operator<<(std::ostream& stream, Token::Type type) {
         str = "INT";
         break;
     case Token::Type::ASSIGN:
-        str = "ASSIGN";
+        str = "=";
         break;
     case Token::Type::PLUS:
-        str = "PLUS";
+        str = "+";
         break;
     case Token::Type::COMMA:
-        str = "COMMA";
+        str = ",";
         break;
     case Token::Type::SEMICOLON:
-        str = "SEMICOLON";
+        str = ";";
         break;
     case Token::Type::LPAREN:
-        str = "LPAREN";
+        str = "(";
         break;
     case Token::Type::RPAREN:
-        str = "RPAREN";
+        str = ")";
         break;
     case Token::Type::LBRACE:
-        str = "LBRACE";
+        str = "{";
         break;
     case Token::Type::RBRACE:
-        str = "RBRACE";
+        str = "}";
         break;
     case Token::Type::FUNCTION:
-        str = "FUNCTION";
+        str = "fn";
         break;
     case Token::Type::LET:
-        str = "LET";
+        str = "let";
         break;
     case Token::Type::BANG:
-        str = "BANG";
+        str = "!";
         break;
     case Token::Type::MINUS:
-        str = "MINUS";
+        str = "-";
         break;
     case Token::Type::SLASH:
-        str = "SLASH";
+        str = "/";
         break;
     case Token::Type::ASTERISK:
-        str = "ASTERISK";
+        str = "*";
         break;
-    case Token::Type::LESS_THAN:
-        str = "LESS_THAN";
+    case Token::Type::LESS:
+        str = "<";
         break;
-    case Token::Type::GREATER_THAN:
-        str = "GREATER_THAN";
+    case Token::Type::GREATER:
+        str = ">";
+        break;
+    case Token::Type::LESS_EQUAL:
+        str = "<=";
+        break;
+    case Token::Type::GREATER_EQUAL:
+        str = ">=";
         break;
     case Token::Type::TRUE:
-        str = "TRUE";
+        str = "true";
         break;
     case Token::Type::FALSE:
-        str = "FALSE";
+        str = "false";
         break;
     case Token::Type::IF:
-        str = "IF";
+        str = "if";
         break;
     case Token::Type::ELSE:
-        str = "ELSE";
+        str = "else";
         break;
     case Token::Type::RETURN:
-        str = "RETURN";
+        str = "return";
         break;
     case Token::Type::EQUAL:
-        str = "EQUAL";
+        str = "==";
         break;
     case Token::Type::NOT_EQUAL:
-        str = "NOT_EQUAL";
+        str = "!=";
         break;
     }
 

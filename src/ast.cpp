@@ -43,10 +43,10 @@ void BooleanLiteral::Print(std::ostream& stream) const {
 
 void PrefixExpression::Print(std::ostream& stream) const {
     switch (op) {
-    case Operation::Negate:
+    case Operation::NEGATE:
         stream << "-";
         break;
-    case Operation::Not:
+    case Operation::NOT:
         stream << "!";
         break;
     }
@@ -55,10 +55,10 @@ void PrefixExpression::Print(std::ostream& stream) const {
 
 std::ostream& operator<<(std::ostream& stream, PrefixExpression::Operation op) {
     switch (op) {
-        case PrefixExpression::Operation::Negate:
+        case PrefixExpression::Operation::NEGATE:
             stream << "-";
             break;
-        case PrefixExpression::Operation::Not:
+        case PrefixExpression::Operation::NOT:
             stream << "!";
             break;
     }
@@ -69,29 +69,35 @@ std::ostream& operator<<(std::ostream& stream, PrefixExpression::Operation op) {
 void InfixExpression::Print(std::ostream& stream) const {
     stream << "(" << *left << " ";
     switch (op) {
-    case Operation::Add:
+    case Operation::ADD:
         stream << "+";
         break;
-    case Operation::Subtract:
+    case Operation::SUBTRACT:
         stream << "-";
         break;
-    case Operation::Multiply:
+    case Operation::MULTIPLY:
         stream << "*";
         break;
-    case Operation::Divide:
+    case Operation::DIVIDE:
         stream << "/";
         break;
-    case Operation::LessThan:
+    case Operation::LESS:
         stream << "<";
         break;
-    case Operation::GreaterThan:
+    case Operation::GREATER:
         stream << ">";
         break;
-    case Operation::Equal:
+    case Operation::EQUAL:
         stream << "==";
         break;
-    case Operation::NotEqual:
+    case Operation::NOT_EQUAL:
         stream << "!=";
+        break;
+    case Operation::LESS_EQUAL:
+        stream << "<=";
+        break;
+    case Operation::GREATER_EQUAL:
+        stream << ">=";
         break;
     }
     stream << " " << *right << ")";
@@ -99,29 +105,35 @@ void InfixExpression::Print(std::ostream& stream) const {
 
 std::ostream& operator<<(std::ostream& stream, InfixExpression::Operation op) {
     switch (op) {
-        case InfixExpression::Operation::Add:
+        case InfixExpression::Operation::ADD:
             stream << "+";
             break;
-        case InfixExpression::Operation::Subtract:
+        case InfixExpression::Operation::SUBTRACT:
             stream << "-";
             break;
-        case InfixExpression::Operation::Multiply:
+        case InfixExpression::Operation::MULTIPLY:
             stream << "*";
             break;
-        case InfixExpression::Operation::Divide:
+        case InfixExpression::Operation::DIVIDE:
             stream << "/";
             break;
-        case InfixExpression::Operation::LessThan:
+        case InfixExpression::Operation::LESS:
             stream << "<";
             break;
-        case InfixExpression::Operation::GreaterThan:
+        case InfixExpression::Operation::GREATER:
             stream << ">";
             break;
-        case InfixExpression::Operation::Equal:
+        case InfixExpression::Operation::EQUAL:
             stream << "==";
             break;
-        case InfixExpression::Operation::NotEqual:
+        case InfixExpression::Operation::NOT_EQUAL:
             stream << "!=";
+            break;
+        case InfixExpression::Operation::LESS_EQUAL:
+            stream << "<=";
+            break;
+        case InfixExpression::Operation::GREATER_EQUAL:
+            stream << ">=";
             break;
     }
 

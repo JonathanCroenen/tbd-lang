@@ -1,85 +1,89 @@
 #include "lexer.h"
 
-
-
 inline bool IsAlphaNumerical(char c) {
     return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z') || c == '_';
 }
 
-inline bool IsDigit(char c) {
-    return '0' <= c && c <= '9';
-}
+inline bool IsDigit(char c) { return '0' <= c && c <= '9'; }
 
 inline bool IsWhitespace(char c) {
     return c == ' ' || c == '\t' || c == '\n' || c == '\r';
 }
 
-
 Lexer::Lexer(const std::string& input)
-    : _input(input), _position(0), _read_position(1), _char(input[0]) {}
+    : _input(input), _position(0), _read_position(1), _char(input[0]), _line(0),
+      _column(0) {}
 
 Token Lexer::NextToken() {
-    while (IsWhitespace(_char)) {
-        Advance();
-    }
+    SkipWhitespace();
 
-    Token token = Token(Token::Type::ILLEGAL, "");
+    Token token = CreateToken(Token::Type::ILLEGAL, "");
 
     switch (_char) {
     case '+':
-        token = Token(Token::Type::PLUS, "+");
+        token = CreateToken(Token::Type::PLUS, "+");
         break;
     case '-':
-        token = Token(Token::Type::MINUS, "-");
+        token = CreateToken(Token::Type::MINUS, "-");
         break;
     case '*':
-        token = Token(Token::Type::ASTERISK, "*");
+        token = CreateToken(Token::Type::ASTERISK, "*");
         break;
     case '/':
-        token = Token(Token::Type::SLASH, "/");
+        token = CreateToken(Token::Type::SLASH, "/");
         break;
     case '=':
         if (Peek() == '=') {
             Advance();
-            token = Token(Token::Type::EQUAL, "==");
+            token = CreateToken(Token::Type::EQUAL, "==");
         } else {
-            token = Token(Token::Type::ASSIGN, "=");
+            token = CreateToken(Token::Type::ASSIGN, "=");
         }
         break;
     case '!':
         if (Peek() == '=') {
             Advance();
-            token = Token(Token::Type::NOT_EQUAL, "!=");
+            token = CreateToken(Token::Type::NOT_EQUAL, "!=");
         } else {
-        token = Token(Token::Type::BANG, "!");
-            }
+            token = CreateToken(Token::Type::BANG, "!");
+        }
         break;
     case '<':
-        token = Token(Token::Type::LESS_THAN, "<");
+        if (Peek() == '=') {
+            Advance();
+            token = CreateToken(Token::Type::LESS_EQUAL, "<=");
+        } else {
+            token = CreateToken(Token::Type::LESS, "<");
+        }
         break;
     case '>':
-        token = Token(Token::Type::GREATER_THAN, ">");
+        if (Peek() == '=') {
+            Advance();
+            token = CreateToken(Token::Type::GREATER_EQUAL, ">=");
+        } else {
+            token = CreateToken(Token::Type::GREATER, ">");
+        }
         break;
     case ',':
-        token = Token(Token::Type::COMMA, ",");
+        token = CreateToken(Token::Type::COMMA, ",");
         break;
     case ';':
-        token = Token(Token::Type::SEMICOLON, ";");
+        token = CreateToken(Token::Type::SEMICOLON, ";");
         break;
     case '(':
-        token = Token(Token::Type::LPAREN, "(");
+        token = CreateToken(Token::Type::LPAREN, "(");
         break;
     case ')':
-        token = Token(Token::Type::RPAREN, ")");
+        token = CreateToken(Token::Type::RPAREN, ")");
         break;
     case '{':
-        token = Token(Token::Type::LBRACE, "{");
+        token = CreateToken(Token::Type::LBRACE, "{");
         break;
     case '}':
-        token = Token(Token::Type::RBRACE, "}");
+        token = CreateToken(Token::Type::RBRACE, "}");
         break;
     case '\0':
-        token = Token(Token::Type::EOF, "");
+        token = CreateToken(Token::Type::EOF, "");
         break;
     case 'a' ... 'z':
     case 'A' ... 'Z':
@@ -102,6 +106,7 @@ void Lexer::Advance() {
 
     _position = _read_position;
     _read_position++;
+    _column++;
 }
 
 char Lexer::Peek() {
@@ -109,6 +114,20 @@ char Lexer::Peek() {
         return '\0';
     } else {
         return _input[_read_position];
+    }
+}
+
+Token Lexer::CreateToken(Token::Type type, std::string literal) {
+    return Token(type, literal, _line, _column);
+}
+
+void Lexer::SkipWhitespace() {
+    while (IsWhitespace(_char)) {
+        if (_char == '\n') {
+            _line++;
+            _column = 0;
+        }
+        Advance();
     }
 }
 
@@ -121,10 +140,10 @@ Token Lexer::ReadIdentifier() {
     std::string literal = _input.substr(position, _position - position);
 
     if (keywords.find(literal) != keywords.end()) {
-        return Token(keywords[literal], literal);
+        return CreateToken(keywords[literal], literal);
     }
 
-    return Token(Token::Type::IDENT, literal);
+    return CreateToken(Token::Type::IDENT, literal);
 }
 
 Token Lexer::ReadNumber() {
@@ -132,5 +151,5 @@ Token Lexer::ReadNumber() {
     while (IsDigit(_char)) {
         Advance();
     }
-    return Token(Token::Type::INT, _input.substr(position, _position - position));
+    return CreateToken(Token::Type::INT, _input.substr(position, _position - position));
 }

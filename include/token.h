@@ -2,6 +2,7 @@
 
 #include <string>
 #undef EOF
+#include <ostream>
 
 struct Token {
     enum Type {
@@ -21,8 +22,10 @@ struct Token {
         BANG,
         ASTERISK,
         SLASH,
-        LESS_THAN,
-        GREATER_THAN,
+        LESS,
+        GREATER,
+        LESS_EQUAL,
+        GREATER_EQUAL,
         EQUAL,
         NOT_EQUAL,
         // Delimiters
@@ -40,7 +43,7 @@ struct Token {
         RETURN,
     };
 
-    Token(Type type, std::string literal);
+    Token(Type type, std::string literal, uint line, uint column);
 
     Token(Token&& other) = default;
     Token& operator=(Token&& other) = default;
@@ -50,4 +53,6 @@ struct Token {
 
     Type type;
     std::string literal;
+    uint line;
+    uint column;
 };

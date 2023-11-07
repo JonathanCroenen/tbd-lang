@@ -124,8 +124,8 @@ private:
 // <OPERATOR><EXPRESSION>
 struct PrefixExpression : Expression {
     enum Operation {
-        Negate,
-        Not,
+        NEGATE,
+        NOT,
     };
 
     PrefixExpression(Operation op, Expression* right) : Expression(Type::PREFIX), op(op), right(right) {}
@@ -142,14 +142,16 @@ private:
 // <EXPRESSION><OPERATOR><EXPRESSION>
 struct InfixExpression : Expression {
     enum Operation {
-        Add,
-        Subtract,
-        Multiply,
-        Divide,
-        LessThan,
-        GreaterThan,
-        Equal,
-        NotEqual,
+        ADD,
+        SUBTRACT,
+        MULTIPLY,
+        DIVIDE,
+        LESS,
+        GREATER,
+        LESS_EQUAL,
+        GREATER_EQUAL,
+        EQUAL,
+        NOT_EQUAL,
     };
 
     InfixExpression(Operation op, Expression* left, Expression* right)

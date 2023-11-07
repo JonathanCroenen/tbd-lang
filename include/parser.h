@@ -7,14 +7,13 @@
 #include "lexer.h"
 #include "ast.h"
 
-// TODO: reference token or line number or something
 class ParseError : public std::exception {
 public:
-    ParseError(const std::string& message) : _message(message) {}
-
-    const char* what() const noexcept override {
-        return _message.c_str();
+    ParseError(const std::string& message, uint line, uint column) {
+        _message = message + " at " + std::to_string(line) + ":" + std::to_string(column);
     }
+
+    const char* what() const noexcept override { return _message.c_str(); }
 
 private:
     std::string _message;
@@ -28,6 +27,14 @@ public:
     std::vector<ParseError> GetErrors() const { return _errors; }
 
 private:
+    Lexer& _lexer;
+    Token _current_token;
+    Token _peek_token;
+
+    bool _in_function = false;
+
+    std::vector<ParseError> _errors;
+
     enum Precedence {
         LOWEST,
         EQUAL,
@@ -39,14 +46,6 @@ private:
     };
 
     Precedence GetPrecedence(Token::Type type);
-
-    Lexer& _lexer;
-    Token _current_token;
-    Token _peek_token;
-
-    bool _in_function = false;
-
-    std::vector<ParseError> _errors;
 
     void Advance();
     Statement* ParseStatement();

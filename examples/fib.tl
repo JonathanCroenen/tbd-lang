@@ -5,4 +5,4 @@ let fib = fn(n) {
     else { fib(n - 1) + fib(n - 2) }
 }
 
-return fib(10);
+fib(10);

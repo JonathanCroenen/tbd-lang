@@ -2,7 +2,7 @@
 #include <sstream>
 
 std::shared_ptr TRUE = std::make_shared<Boolean>(true);
-std::shared_ptr FALSE = std::make_shared<Boolean>(true);
+std::shared_ptr FALSE = std::make_shared<Boolean>(false);
 std::shared_ptr NIL = std::make_shared<Nil>();
 
 bool IsTruthy(ObjectPtr object) {
@@ -127,9 +127,9 @@ ObjectPtr Evaluator::EvalPrefix(PrefixExpression const* node,
     }
 
     switch (node->op) {
-    case PrefixExpression::Operation::Not:
+    case PrefixExpression::Operation::NOT:
         return IsTruthy(right) ? FALSE : TRUE;
-    case PrefixExpression::Operation::Negate:
+    case PrefixExpression::Operation::NEGATE:
         return std::make_shared<Integer>(-static_cast<Integer*>(right.get())->value);
     }
 
@@ -168,22 +168,26 @@ ObjectPtr Evaluator::EvalIntInfix(Integer const* left,
                                   Integer const* right,
                                   InfixExpression::Operation op) {
     switch (op) {
-    case InfixExpression::Operation::Add:
+    case InfixExpression::Operation::ADD:
         return std::make_shared<Integer>(left->value + right->value);
-    case InfixExpression::Operation::Subtract:
+    case InfixExpression::Operation::SUBTRACT:
         return std::make_shared<Integer>(left->value - right->value);
-    case InfixExpression::Operation::Multiply:
+    case InfixExpression::Operation::MULTIPLY:
         return std::make_shared<Integer>(left->value * right->value);
-    case InfixExpression::Operation::Divide:
+    case InfixExpression::Operation::DIVIDE:
         return std::make_shared<Integer>(left->value / right->value);
-    case InfixExpression::Operation::Equal:
-        return left->value == right->value ? TRUE : FALSE;
-    case InfixExpression::Operation::NotEqual:
-        return left->value != right->value ? TRUE : FALSE;
-    case InfixExpression::Operation::LessThan:
-        return left->value < right->value ? TRUE : FALSE;
-    case InfixExpression::Operation::GreaterThan:
-        return left->value > right->value ? TRUE : FALSE;
+    case InfixExpression::Operation::EQUAL:
+        return (left->value == right->value) ? TRUE : FALSE;
+    case InfixExpression::Operation::NOT_EQUAL:
+        return (left->value != right->value) ? TRUE : FALSE;
+    case InfixExpression::Operation::LESS:
+        return (left->value < right->value) ? TRUE : FALSE;
+    case InfixExpression::Operation::GREATER:
+        return (left->value > right->value) ? TRUE : FALSE;
+    case InfixExpression::Operation::LESS_EQUAL:
+        return (left->value <= right->value) ? TRUE : FALSE;
+    case InfixExpression::Operation::GREATER_EQUAL:
+        return (left->value >= right->value) ? TRUE : FALSE;
     }
 
     return std::make_shared<Error>("found impossible integer infix expression");
@@ -193,9 +197,9 @@ ObjectPtr Evaluator::EvalBoolInfix(Boolean const* left,
                                    Boolean const* right,
                                    InfixExpression::Operation op) {
     switch (op) {
-    case InfixExpression::Operation::Equal:
+    case InfixExpression::Operation::EQUAL:
         return left->value == right->value ? TRUE : FALSE;
-    case InfixExpression::Operation::NotEqual:
+    case InfixExpression::Operation::NOT_EQUAL:
         return left->value != right->value ? TRUE : FALSE;
     default:
         return std::make_shared<Error>("unsupported operator for booleans");
