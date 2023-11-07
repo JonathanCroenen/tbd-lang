@@ -21,5 +21,3 @@ struct Environment {
 
     friend std::ostream& operator<<(std::ostream& stream, const Environment& environment);
 };
-
-std::ostream& operator<<(std::ostream& stream, const Environment& environment);

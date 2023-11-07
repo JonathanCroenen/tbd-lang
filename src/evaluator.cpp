@@ -1,5 +1,5 @@
 #include "evaluator.h"
-#include <iostream>
+#include <sstream>
 
 std::shared_ptr TRUE = std::make_shared<Boolean>(true);
 std::shared_ptr FALSE = std::make_shared<Boolean>(true);
@@ -15,7 +15,7 @@ bool IsTruthy(ObjectPtr object) {
     if (object == NIL) {
         return false;
     }
-    if (object->type == Object::Type::INTEGER) {
+    if (object->type == Object::Type::INT) {
         return static_cast<Integer*>(object.get())->value != 0;
     }
 
@@ -23,13 +23,12 @@ bool IsTruthy(ObjectPtr object) {
 }
 
 ObjectPtr Evaluator::Evaluate(const Program& node, EnvironmentPtr environment) {
-    ObjectPtr result = NIL;
+    ObjectPtr result;
     for (const Statement* statement : node.statements) {
         result = EvalStatement(statement, environment);
         if (result->type == Object::Type::RETURN) {
             return static_cast<Return*>(result.get())->value;
         }
-
         if (result->type == Object::Type::ERROR) {
             return result;
         }
@@ -58,7 +57,7 @@ ObjectPtr Evaluator::EvalLet(LetStatement const* node, EnvironmentPtr environmen
     if (value->type == Object::Type::ERROR) {
         return value;
     }
-    if (value-> type == Object::Type::FUNCTION) {
+    if (value->type == Object::Type::FUNCTION) {
         Function* function = static_cast<Function*>(value.get());
         function->environment->Set(node->name->value, value);
     }
@@ -147,20 +146,22 @@ ObjectPtr Evaluator::EvalInfix(InfixExpression const* node, EnvironmentPtr envir
         return right;
     }
 
-    if (left->type == Object::Type::INTEGER && right->type == Object::Type::INTEGER) {
+    if (left->type == Object::Type::INT && right->type == Object::Type::INT) {
         return EvalIntInfix(static_cast<Integer*>(left.get()),
                             static_cast<Integer*>(right.get()),
                             node->op);
     }
 
-    if (left->type == Object::Type::BOOLEAN && right->type == Object::Type::BOOLEAN) {
+    if (left->type == Object::Type::BOOL && right->type == Object::Type::BOOL) {
         return EvalBoolInfix(static_cast<Boolean*>(left.get()),
                              static_cast<Boolean*>(right.get()),
                              node->op);
     }
 
-    // TODO print the actual types
-    return std::make_shared<Error>("type mismatch");
+    std::stringstream stream;
+    stream << "type mismatch for \"" << node->op << "\", found " << left->type << " and "
+           << right->type;
+    return std::make_shared<Error>(stream.str());
 }
 
 ObjectPtr Evaluator::EvalIntInfix(Integer const* left,
@@ -231,7 +232,8 @@ ObjectPtr Evaluator::EvalIfElse(IfElseExpression const* node,
     return NIL;
 }
 
-ObjectPtr Evaluator::EvalFunction(FunctionExpression const* node, EnvironmentPtr environment) {
+ObjectPtr Evaluator::EvalFunction(FunctionExpression const* node,
+                                  EnvironmentPtr environment) {
     // TODO: filter only the closed over variables
     EnvironmentPtr closed = std::make_shared<Environment>(*environment);
     return std::make_shared<Function>(node->parameters, node->body, closed);
@@ -262,7 +264,8 @@ ObjectPtr Evaluator::EvalCall(CallExpression const* node, EnvironmentPtr environ
                 std::to_string(arguments.size()));
         }
 
-        EnvironmentPtr extended = std::make_shared<Environment>(function_object->environment);
+        EnvironmentPtr extended =
+            std::make_shared<Environment>(function_object->environment);
         for (size_t i = 0; i < arguments.size(); ++i) {
             extended->Set(function_object->parameters[i]->value, arguments[i]);
         }
@@ -275,5 +278,7 @@ ObjectPtr Evaluator::EvalCall(CallExpression const* node, EnvironmentPtr environ
         return result;
     }
 
-    return std::make_shared<Error>("not a function");
+    std::stringstream stream;
+    stream << "\"" << *function << "\" is not a function";
+    return std::make_shared<Error>(stream.str());
 }

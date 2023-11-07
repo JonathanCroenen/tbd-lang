@@ -44,6 +44,8 @@ private:
     Token _current_token;
     Token _peek_token;
 
+    bool _in_function = false;
+
     std::vector<ParseError> _errors;
 
     void Advance();

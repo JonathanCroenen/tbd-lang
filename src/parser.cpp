@@ -3,7 +3,6 @@
 #include <iostream>
 #include <sstream>
 
-
 Parser::Parser(Lexer& lexer)
     : _lexer(lexer), _current_token(lexer.NextToken()), _peek_token(lexer.NextToken()) {}
 
@@ -31,7 +30,12 @@ Statement* Parser::ParseStatement() {
     case Token::Type::LET:
         return ParseLetStatement();
     case Token::Type::RETURN:
-        return ParseReturnStatement();
+        if (_in_function) {
+            return ParseReturnStatement();
+        }
+
+        Error("Return statements can only be used inside functions");
+        return nullptr;
     default:
         return ParseExpressionStatement();
     }
@@ -141,9 +145,7 @@ Expression* Parser::ParseExpression(Precedence precedence) {
     return left;
 }
 
-Identifier* Parser::ParseIdentifier() {
-    return new Identifier(_current_token.literal);
-}
+Identifier* Parser::ParseIdentifier() { return new Identifier(_current_token.literal); }
 
 IntegerLiteral* Parser::ParseIntegerLiteral() {
     return new IntegerLiteral(std::stoi(_current_token.literal));
@@ -285,6 +287,8 @@ IfElseExpression* Parser::ParseIfElseExpression() {
 }
 
 FunctionExpression* Parser::ParseFunctionLiteral() {
+    _in_function = true;
+
     if (!PeekOrError(Token::Type::LPAREN)) {
         return nullptr;
     }
@@ -320,6 +324,7 @@ FunctionExpression* Parser::ParseFunctionLiteral() {
         return nullptr;
     }
 
+    _in_function = false;
     return new FunctionExpression(parameters, body);
 }
 
@@ -346,9 +351,7 @@ CallExpression* Parser::ParseCallExpression(Expression* left) {
     return new CallExpression(left, arguments);
 }
 
-void Parser::Error(const std::string& message) {
-    _errors.emplace_back(message);
-}
+void Parser::Error(const std::string& message) { _errors.emplace_back(message); }
 
 bool Parser::PeekOrError(Token::Type type) {
     if (_peek_token.type != type) {
@@ -382,4 +385,3 @@ Parser::Precedence Parser::GetPrecedence(Token::Type type) {
         return Precedence::LOWEST;
     }
 }
-

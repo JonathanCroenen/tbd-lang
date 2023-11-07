@@ -53,6 +53,19 @@ void PrefixExpression::Print(std::ostream& stream) const {
     stream << *right;
 }
 
+std::ostream& operator<<(std::ostream& stream, PrefixExpression::Operation op) {
+    switch (op) {
+        case PrefixExpression::Operation::Negate:
+            stream << "-";
+            break;
+        case PrefixExpression::Operation::Not:
+            stream << "!";
+            break;
+    }
+
+    return stream;
+}
+
 void InfixExpression::Print(std::ostream& stream) const {
     stream << "(" << *left << " ";
     switch (op) {
@@ -82,6 +95,37 @@ void InfixExpression::Print(std::ostream& stream) const {
         break;
     }
     stream << " " << *right << ")";
+}
+
+std::ostream& operator<<(std::ostream& stream, InfixExpression::Operation op) {
+    switch (op) {
+        case InfixExpression::Operation::Add:
+            stream << "+";
+            break;
+        case InfixExpression::Operation::Subtract:
+            stream << "-";
+            break;
+        case InfixExpression::Operation::Multiply:
+            stream << "*";
+            break;
+        case InfixExpression::Operation::Divide:
+            stream << "/";
+            break;
+        case InfixExpression::Operation::LessThan:
+            stream << "<";
+            break;
+        case InfixExpression::Operation::GreaterThan:
+            stream << ">";
+            break;
+        case InfixExpression::Operation::Equal:
+            stream << "==";
+            break;
+        case InfixExpression::Operation::NotEqual:
+            stream << "!=";
+            break;
+    }
+
+    return stream;
 }
 
 void BlockExpression::Print(std::ostream& stream) const {

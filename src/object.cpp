@@ -6,6 +6,31 @@ std::ostream& operator<<(std::ostream& stream, const Object& object) {
     return stream;
 }
 
+std::ostream& operator<<(std::ostream& stream, Object::Type type) {
+    switch (type) {
+        case Object::Type::INT:
+            stream << "INT";
+            break;
+        case Object::Type::BOOL:
+            stream << "BOOL";
+            break;
+        case Object::Type::NIL:
+            stream << "NIL";
+            break;
+        case Object::Type::RETURN:
+            stream << "RETURN";
+            break;
+        case Object::Type::FUNCTION:
+            stream << "FUNCTION";
+            break;
+        case Object::Type::ERROR:
+            stream << "ERROR";
+            break;
+    }
+
+    return stream;
+}
+
 void Integer::Print(std::ostream& stream) const {
     stream << value;
 }

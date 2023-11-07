@@ -9,8 +9,8 @@ struct Environment;
 
 struct Object {
     enum Type {
-        INTEGER,
-        BOOLEAN,
+        INT,
+        BOOL,
         NIL,
         RETURN,
         FUNCTION,
@@ -20,6 +20,7 @@ struct Object {
     Type type;
 
     friend std::ostream& operator<<(std::ostream& stream, const Object& object);
+    friend std::ostream& operator<<(std::ostream& stream, Type type);
 
 protected:
     Object(Type type) : type(type) {}
@@ -28,7 +29,7 @@ protected:
 };
 
 struct Integer : Object {
-    Integer(int value) : Object(Type::INTEGER), value(value) {}
+    Integer(int value) : Object(Type::INT), value(value) {}
 
     int value;
 
@@ -37,7 +38,7 @@ protected:
 };
 
 struct Boolean : Object {
-    Boolean(bool value) : Object(Type::BOOLEAN), value(value) {}
+    Boolean(bool value) : Object(Type::BOOL), value(value) {}
 
     bool value;
 
