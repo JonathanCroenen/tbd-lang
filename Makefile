@@ -7,8 +7,8 @@ SRCDIR = ./src/
 OBJDIR = ./obj/
 BINDIR = ./bin/
 
-INC = -I./include/ -I/home/jonathan/Dev/Include/
-LIB = -L/home/jonathan/Dev/Lib 
+INC = -I./include/
+LIB =
 
 SRC := $(shell find $(SRCDIR) -maxdepth 1 -type f -name "*.cpp")
 OBJ := $(patsubst $(SRCDIR)%, $(OBJDIR)%, $(SRC:.cpp=.o))
