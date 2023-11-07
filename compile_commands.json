@@ -1,0 +1,40 @@
+[
+  {
+    "arguments": [
+      "/usr/bin/g++",
+      "-c",
+      "-Wall",
+      "-Wextra",
+      "-g",
+      "-std=c++17",
+      "-O1",
+      "-I./include/",
+      "-I/home/jonathan/Dev/Include/",
+      "-o",
+      "obj/main.o",
+      "src/main.cpp"
+    ],
+    "directory": "/home/jonathan/Dev/Code/lang",
+    "file": "/home/jonathan/Dev/Code/lang/src/main.cpp",
+    "output": "/home/jonathan/Dev/Code/lang/obj/main.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/g++",
+      "-c",
+      "-Wall",
+      "-Wextra",
+      "-g",
+      "-std=c++17",
+      "-O1",
+      "-I./include/",
+      "-I/home/jonathan/Dev/Include/",
+      "-o",
+      "obj/lexer.o",
+      "src/lexer.cpp"
+    ],
+    "directory": "/home/jonathan/Dev/Code/lang",
+    "file": "/home/jonathan/Dev/Code/lang/src/lexer.cpp",
+    "output": "/home/jonathan/Dev/Code/lang/obj/lexer.o"
+  }
+]

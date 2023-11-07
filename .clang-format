@@ -1,0 +1,16 @@
+---
+IndentWidth: 4
+ColumnLimit: 90
+PointerAlignment: Left
+NamespaceIndentation: None
+AllowShortBlocksOnASingleLine: Always
+AllowShortFunctionsOnASingleLine: All
+AccessModifierOffset: -4
+LambdaBodyIndentation: OuterScope
+SortIncludes: false
+BinPackParameters: false
+BinPackArguments: false
+AlwaysBreakAfterReturnType: None
+AllowAllParametersOfDeclarationOnNextLine: true
+AlignTrailingComments: Always
+---
