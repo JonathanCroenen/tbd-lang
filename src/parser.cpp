@@ -38,6 +38,9 @@ Parser::Precedence Parser::GetPrecedence(Token::Type type) {
     case Token::Type::LESS_EQUAL:
     case Token::Type::GREATER_EQUAL:
         return Precedence::EQUAL;
+    case Token::Type::OR:
+    case Token::Type::AND:
+        return Precedence::AND_OR;
     default:
         return Precedence::LOWEST;
     }
@@ -57,7 +60,7 @@ Statement* Parser::ParseStatement() {
             return ParseReturnStatement();
         }
 
-        Error("Return statements can only be used inside functions");
+        Error("Return statements can only be used inside functions", _current_token);
         return nullptr;
     default:
         return ParseExpressionStatement();
@@ -84,9 +87,12 @@ LetStatement* Parser::ParseLetStatement() {
         return nullptr;
     }
 
-    if (_peek_token.type == Token::Type::SEMICOLON) {
-        Advance();
+    // let is required to end in a ;
+    if (!PeekOrError(Token::Type::SEMICOLON)) {
+        return nullptr;
     }
+
+    Advance();
 
     return new LetStatement(new Identifier(name), expression);
 }
@@ -99,9 +105,12 @@ ReturnStatement* Parser::ParseReturnStatement() {
         return nullptr;
     }
 
-    if (_peek_token.type == Token::Type::SEMICOLON) {
-        Advance();
+    // return is required to end in a ;
+    if (!PeekOrError(Token::Type::SEMICOLON)) {
+        return nullptr;
     }
+
+    Advance();
 
     return new ReturnStatement(expression);
 }
@@ -112,9 +121,15 @@ ExpressionStatement* Parser::ParseExpressionStatement() {
         return nullptr;
     }
 
-    if (_peek_token.type == Token::Type::SEMICOLON) {
+    // end in a ; unless we ended in a block like "if { ... }"
+    if (_current_token.type != Token::Type::RBRACE) {
+        if (!PeekOrError(Token::Type::SEMICOLON)) {
+            return nullptr;
+        }
+
         Advance();
     }
+
 
     return new ExpressionStatement(expression);
 }
@@ -151,7 +166,7 @@ Expression* Parser::ParseExpression(Precedence precedence) {
         left = ParseFunctionLiteral();
         break;
     default:
-        Error("Unexpected token \"" + _current_token.literal + "\"");
+        Error("Unexpected token \"" + _current_token.literal + "\"", _current_token);
         return nullptr;
     }
 
@@ -228,10 +243,14 @@ Expression* Parser::ParseInfixExpression(Expression* left) {
         return ParseBasicInfixExpression(left, InfixExpression::Operation::GREATER_EQUAL);
     case Token::Type::GREATER:
         return ParseBasicInfixExpression(left, InfixExpression::Operation::GREATER);
+    case Token::Type::AND:
+        return ParseBasicInfixExpression(left, InfixExpression::Operation::AND);
+    case Token::Type::OR:
+        return ParseBasicInfixExpression(left, InfixExpression::Operation::OR);
     case Token::Type::LPAREN:
         return ParseCallExpression(left);
     default:
-        Error("Unexpected token \"" + _current_token.literal + "\"");
+        Error("Unexpected token \"" + _current_token.literal + "\"", _current_token);
         return nullptr;
     }
 }
@@ -378,16 +397,19 @@ CallExpression* Parser::ParseCallExpression(Expression* left) {
     return new CallExpression(left, arguments);
 }
 
-void Parser::Error(const std::string& message) {
-    _errors.emplace_back(message, _current_token.line, _current_token.column);
+void Parser::Error(const std::string& message, const Token& token) {
+    _errors.emplace_back(message, token.line, token.column);
+}
+
+void Parser::ExpectedError(Token::Type expected, const Token& found) {
+    std::stringstream str;
+    str << "Expected token \"" << expected << "\", but found \"" << found << "\"";
+    Error(str.str(), found);
 }
 
 bool Parser::PeekOrError(Token::Type type) {
     if (_peek_token.type != type) {
-        std::stringstream str;
-        str << "Expected token \"" << type << "\", but found \"" << _peek_token << "\"";
-        Error(str.str());
-
+        ExpectedError(type, _peek_token);
         return false;
     }
 

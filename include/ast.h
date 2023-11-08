@@ -152,6 +152,8 @@ struct InfixExpression : Expression {
         GREATER_EQUAL,
         EQUAL,
         NOT_EQUAL,
+        AND,
+        OR,
     };
 
     InfixExpression(Operation op, Expression* left, Expression* right)

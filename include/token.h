@@ -41,6 +41,8 @@ struct Token {
         IF,
         ELSE,
         RETURN,
+        OR,
+        AND,
     };
 
     Token(Type type, std::string literal, uint line, uint column);

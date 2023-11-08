@@ -28,12 +28,10 @@ private:
     ObjectPtr EvalIdentifier(Identifier const* node, EnvironmentPtr environment);
     ObjectPtr EvalPrefix(PrefixExpression const* node, EnvironmentPtr environment);
     ObjectPtr EvalInfix(InfixExpression const* node, EnvironmentPtr environment);
-    ObjectPtr EvalIntInfix(Integer const* left,
-                           Integer const* right,
-                           InfixExpression::Operation op);
-    ObjectPtr EvalBoolInfix(Boolean const* left,
-                            Boolean const* right,
-                            InfixExpression::Operation op);
+    ObjectPtr
+    EvalIntInfix(ObjectPtr left, ObjectPtr right, InfixExpression::Operation op);
+    ObjectPtr
+    EvalBoolInfix(ObjectPtr left, ObjectPtr right, InfixExpression::Operation op);
     ObjectPtr EvalBlock(BlockExpression const* node, EnvironmentPtr environment);
     ObjectPtr EvalIfElse(IfElseExpression const* node, EnvironmentPtr environment);
     ObjectPtr EvalFunction(FunctionExpression const* node, EnvironmentPtr environment);

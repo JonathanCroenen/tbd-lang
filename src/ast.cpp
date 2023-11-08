@@ -99,6 +99,12 @@ void InfixExpression::Print(std::ostream& stream) const {
     case Operation::GREATER_EQUAL:
         stream << ">=";
         break;
+    case Operation::AND:
+        stream << "&&";
+        break;
+    case Operation::OR:
+        stream << "||";
+        break;
     }
     stream << " " << *right << ")";
 }
@@ -134,6 +140,12 @@ std::ostream& operator<<(std::ostream& stream, InfixExpression::Operation op) {
             break;
         case InfixExpression::Operation::GREATER_EQUAL:
             stream << ">=";
+            break;
+        case InfixExpression::Operation::AND:
+            stream << "and";
+            break;
+        case InfixExpression::Operation::OR:
+            stream << "or";
             break;
     }
 

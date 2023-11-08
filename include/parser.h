@@ -37,6 +37,7 @@ private:
 
     enum Precedence {
         LOWEST,
+        AND_OR,
         EQUAL,
         LESS_GREATER,
         SUM,
@@ -66,6 +67,7 @@ private:
     IfElseExpression* ParseIfElseExpression();
     FunctionExpression* ParseFunctionLiteral();
 
-    void Error(const std::string& message);
+    void Error(const std::string& message, const Token& token);
+    void ExpectedError(Token::Type expected, const Token& found);
     bool PeekOrError(Token::Type type);
 };

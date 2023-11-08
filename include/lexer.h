@@ -38,5 +38,7 @@ inline std::unordered_map<std::string, Token::Type> keywords = {
     {"return", Token::Type::RETURN},
     {"true", Token::Type::TRUE},
     {"false", Token::Type::FALSE},
+    {"or", Token::Type::OR},
+    {"and", Token::Type::AND},
 };
 

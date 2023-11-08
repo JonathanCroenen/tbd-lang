@@ -97,6 +97,12 @@ std::ostream& operator<<(std::ostream& stream, Token::Type type) {
     case Token::Type::NOT_EQUAL:
         str = "!=";
         break;
+    case Token::Type::OR:
+        str = "or";
+        break;
+    case Token::Type::AND:
+        str = "and";
+        break;
     }
 
     return stream << str;
